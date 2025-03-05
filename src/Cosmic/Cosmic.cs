@@ -14,9 +14,12 @@ public unsafe ref struct Cosmic
 
     private static long ElementIdCounter = 0;
 
-    public static void Initialize(Arena* arena)
+    public static void Initialize(nuint capacity)
     {
-        Arena = arena;
+        Arena = ArenaManager.Create(capacity);
+    }
+    public static void Initialize(MemoryUsage usage = MemoryUsage.Medium)
+    {
     }
 
     public static void BeginLayout()
@@ -36,12 +39,14 @@ public unsafe ref struct Cosmic
     {
         var rect= (Rectangle*)Arena->Alloc((nuint)sizeof(Rectangle));
         rect->IntenalId = CreateId();
+        rect->ChildNode = null;
         return rect;
     }
     public static Stack* Stack()
     {
         var stack = (Stack*)Arena->Alloc((nuint)sizeof(Stack));
         stack->IntenalId = CreateId();
+        stack->ChildNode = null;
         return stack;
     }
 
@@ -59,8 +64,14 @@ public unsafe ref struct Cosmic
 
        Arena->Free();
     }
+}
 
-
-
-
+/// <summary>
+/// Memory usage in MB
+/// </summary>
+public enum MemoryUsage
+{
+    Low = 4,
+    Medium = 10,
+    High = 20
 }

@@ -7,10 +7,11 @@ using Cosmic.Core;
 
 namespace Cosmic.Element;
 
-public ref struct Rectangle : IUIElement
+public unsafe ref struct Rectangle : IUIElement
 {
     public ElementKind Kind => ElementKind.Rectangle;
     public Point Position { get; set; }
-    public FixedSize Size { get; set; }
+    public Size Size { get; set; }
     public long IntenalId { get; set; }
+    public unsafe ChildInfo* ChildNode { get;set;}
 }

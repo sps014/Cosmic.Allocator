@@ -11,8 +11,9 @@ public unsafe interface IUIElement
 {
     public long IntenalId { get; set; }
     public Point Position { get; set; }
-    public FixedSize Size { get; set; }
+    public Size Size { get; set; }
     public ElementKind Kind { get; }
+    public ChildInfo* ChildNode { get; set; }
 }
 
 
