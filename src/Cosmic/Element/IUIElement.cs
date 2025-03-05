@@ -7,7 +7,7 @@ using Cosmic.Core;
 
 namespace Cosmic.Element;
 
-public unsafe interface IUIElement
+public unsafe interface IUIElement<T> where T: struct, IUIElement<T>
 {
     long IntenalId { get; set; }
     Point Position { get; set; }
@@ -15,6 +15,7 @@ public unsafe interface IUIElement
     ElementKind Kind { get; }
     ChildInfo* ChildNode { get; set; }
     void* Address {get;internal set;}
+    public T Add<G>(ref G child) where G : struct, IUIElement<G>;
 }
 
 

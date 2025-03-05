@@ -15,6 +15,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{ACCF2D6E
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CosmicTests", "tests\CosmicTests\CosmicTests.csproj", "{B233420B-3198-4BA4-85B2-12E5BF370187}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp", "..\samples\ConsoleApp\ConsoleApp.csproj", "{49204202-0E00-4529-ACB8-0579D58D56D8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{B233420B-3198-4BA4-85B2-12E5BF370187}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B233420B-3198-4BA4-85B2-12E5BF370187}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B233420B-3198-4BA4-85B2-12E5BF370187}.Release|Any CPU.Build.0 = Release|Any CPU
+		{49204202-0E00-4529-ACB8-0579D58D56D8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{49204202-0E00-4529-ACB8-0579D58D56D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{49204202-0E00-4529-ACB8-0579D58D56D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{49204202-0E00-4529-ACB8-0579D58D56D8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -41,5 +47,6 @@ Global
 		{C7701719-7225-4989-B2CE-A5C0EF0E9FA0} = {FAFC8770-9953-458C-9820-F17F2976CDE6}
 		{4380DF5E-9436-4805-8726-11DDEE6E0FCC} = {C64CE1AA-FA5D-41A9-8458-7F8D6F03606A}
 		{B233420B-3198-4BA4-85B2-12E5BF370187} = {ACCF2D6E-4391-42AD-95ED-F574E37DFC33}
+		{49204202-0E00-4529-ACB8-0579D58D56D8} = {C64CE1AA-FA5D-41A9-8458-7F8D6F03606A}
 	EndGlobalSection
 EndGlobal

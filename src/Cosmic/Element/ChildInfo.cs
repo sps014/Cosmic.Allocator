@@ -20,13 +20,13 @@ public unsafe ref struct ChildInfo
         Next->AddNextChild(kind, addressOfChildElement);   
     }
 
-    public Rectangle* GetRect()
+    public readonly Rectangle* GetRect()
     {
         if(Address==null)
             return null;
         return (Rectangle*)Address;
     }
-     public Stack* GetStack()
+     public readonly Stack* GetStack()
     {
         if(Address==null)
             return null;

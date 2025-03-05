@@ -59,8 +59,10 @@ public unsafe ref struct Cosmic
         rect->Address = rectPtr;
         rect->IntenalId = CreateId();
         rect->ChildNode = null;
+        rect->Size = new Core.Size();
         return ref *rect;
     }
+
     public static ref Stack Stack()
     {
         var stackPtr = StackArena->Alloc((nuint)sizeof(Stack));
@@ -68,6 +70,8 @@ public unsafe ref struct Cosmic
         stack->Address = stackPtr;
         stack->IntenalId = CreateId();
         stack->ChildNode = null;
+        stack->Size = new Core.Size();
+
         return ref *stack;
     }
 

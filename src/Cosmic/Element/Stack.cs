@@ -9,39 +9,20 @@ using Cosmic.Core;
 
 namespace Cosmic.Element;
 
-public unsafe ref struct Stack : IUIElement
+public unsafe struct Stack : IUIElement<Stack>
 {
     public Point Position { get; set; }
     public Size Size { get; set; }
 
-    public ElementKind Kind => ElementKind.Stack;
+    public readonly ElementKind Kind => ElementKind.Stack;
 
     public long IntenalId { get; set; }
     public ChildInfo* ChildNode { get;set;}
     public void* Address { get; set;}
 
-    public Stack Add(ref Rectangle rectangle)
+    public Stack Add<G>(ref G child) where G : struct, IUIElement<G>
     {
-        if(ChildNode==null)
-        {
-            ChildNode = Cosmic.ChildNode(ElementKind.Rectangle,rectangle.Address);
-            return this;
-        }
-
-        ChildNode->AddNextChild(ElementKind.Rectangle,rectangle.Address);
-
-        return this;
+        return SharedUIElement.Add(ref this, ref child);
     }
-    public Stack Add(ref Stack stack)
-    {
-        if(ChildNode==null)
-        {
-            ChildNode = Cosmic.ChildNode(ElementKind.Stack,stack.Address);
-            return this;
-        }
 
-        ChildNode->AddNextChild(ElementKind.Stack,stack.Address);
-
-        return this;
-    }
 }

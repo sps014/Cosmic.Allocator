@@ -7,13 +7,17 @@ using Cosmic.Core;
 
 namespace Cosmic.Element;
 
-public unsafe ref struct Rectangle : IUIElement
+public unsafe struct Rectangle : IUIElement<Rectangle>
 {
-    public ElementKind Kind => ElementKind.Rectangle;
+    public readonly ElementKind Kind => ElementKind.Rectangle;
     public Point Position { get; set; }
     public Size Size { get; set; }
     public long IntenalId { get; set; }
     public unsafe ChildInfo* ChildNode { get;set;}
     public void* Address { get; set;}
 
+    public Rectangle Add<G>(ref G child) where G : struct, IUIElement<G>
+    {
+        return SharedUIElement.Add(ref this, ref child);
+    }
 }

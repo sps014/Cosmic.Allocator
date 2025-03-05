@@ -77,6 +77,7 @@ public unsafe ref struct Arena
     public void Free()
     {
         NativeMemory.Free(Data);
+        Data = null;
 
         var next = Next;
         while (next != null)
