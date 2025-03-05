@@ -14,4 +14,6 @@ public unsafe ref struct Rectangle : IUIElement
     public Size Size { get; set; }
     public long IntenalId { get; set; }
     public unsafe ChildInfo* ChildNode { get;set;}
+    public void* Address { get; set;}
+
 }

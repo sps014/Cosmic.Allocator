@@ -9,11 +9,12 @@ namespace Cosmic.Element;
 
 public unsafe interface IUIElement
 {
-    public long IntenalId { get; set; }
-    public Point Position { get; set; }
-    public Size Size { get; set; }
-    public ElementKind Kind { get; }
-    public ChildInfo* ChildNode { get; set; }
+    long IntenalId { get; set; }
+    Point Position { get; set; }
+    Size Size { get; set; }
+    ElementKind Kind { get; }
+    ChildInfo* ChildNode { get; set; }
+    void* Address {get;internal set;}
 }
 
 

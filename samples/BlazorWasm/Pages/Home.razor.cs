@@ -11,8 +11,8 @@ public partial class Home
         unsafe
         {
             var arena = ArenaManager.Create(10 * 1024 * 1024); //10 MB
-            Initialize(arena);
-            var root = Stack()->Add(Rectangle());
+            Initialize(Cosmic.MemoryUsage.High);
+            var root = Stack().Add(ref Rectangle());
             Dispose();
         }
 
