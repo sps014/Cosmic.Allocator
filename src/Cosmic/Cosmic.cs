@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Cosmic.Allocator;
+using Cosmic.Core;
 using Cosmic.Element;
 
 namespace Cosmic;
@@ -55,24 +56,26 @@ public unsafe ref struct Cosmic
     public static ref Rectangle Rectangle()
     {
         var rectPtr=RectArena->Alloc((nuint)sizeof(Rectangle));
-        var rect =  (Rectangle*)rectPtr;
-        rect->Address = rectPtr;
-        rect->IntenalId = CreateId();
-        rect->ChildNode = null;
-        rect->Size = new Core.Size();
+        var rect = CreateElement<Rectangle>(rectPtr);
         return ref *rect;
     }
-
     public static ref Stack Stack()
     {
         var stackPtr = StackArena->Alloc((nuint)sizeof(Stack));
-        var stack = (Stack*) stackPtr;
-        stack->Address = stackPtr;
-        stack->IntenalId = CreateId();
-        stack->ChildNode = null;
-        stack->Size = new Core.Size();
-
+        var stack = CreateElement<Stack>(stackPtr);
         return ref *stack;
+    }
+
+
+    private static T* CreateElement<T>(void* allocAddress) where T : unmanaged, IUIElement<T>
+    {
+        var type = (T*)allocAddress;
+        type->Address = allocAddress;
+        type->IntenalId = CreateId();
+        type->ChildNode = null;
+        type->Size = new Size();
+        type->Position = new Point();
+        return type;
     }
 
     internal static ChildInfo* ChildNode(ElementKind kind,void* addressOfChildElement)
@@ -107,7 +110,18 @@ public unsafe ref struct Cosmic
 /// </summary>
 public enum MemoryUsage
 {
+    /// <summary>
+    /// Allocate low memory
+    /// </summary>
     Low = 5,
+
+    /// <summary>
+    /// Allocate medium memory
+    /// </summary>
     Medium = 20,
+
+    /// <summary>
+    /// Allocate high memory
+    /// </summary>
     High = 40
 }

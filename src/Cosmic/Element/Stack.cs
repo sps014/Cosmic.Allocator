@@ -20,9 +20,9 @@ public unsafe struct Stack : IUIElement<Stack>
     public ChildInfo* ChildNode { get;set;}
     public void* Address { get; set;}
 
-    public Stack Add<G>(ref G child) where G : struct, IUIElement<G>
+    public Stack Add<G>(G child) where G : struct, IUIElement<G>
     {
-        return SharedUIElement.Add(ref this, ref child);
+        return SharedUIElement.Add(ref this, child);
     }
 
 }

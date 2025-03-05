@@ -16,8 +16,8 @@ public unsafe struct Rectangle : IUIElement<Rectangle>
     public unsafe ChildInfo* ChildNode { get;set;}
     public void* Address { get; set;}
 
-    public Rectangle Add<G>(ref G child) where G : struct, IUIElement<G>
+    public Rectangle Add<G>(G child) where G : struct, IUIElement<G>
     {
-        return SharedUIElement.Add(ref this, ref child);
+        return SharedUIElement.Add(ref this, child);
     }
 }

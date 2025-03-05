@@ -18,9 +18,9 @@ public unsafe ref struct TreeWalker
 
         DfsInternal(Root);
     }
-    public static void DfsInternal<T>(T* current) where T : unmanaged,IUIElement<T> 
+    public static void DfsInternal<T>(T* current,int sp =0) where T : unmanaged,IUIElement<T> 
     {
-        Console.WriteLine(typeof(T).Name);
+        Console.WriteLine("|".PadRight(sp,'_')+" "+typeof(T).Name);
 
         var child = current->ChildNode;
 
@@ -29,10 +29,10 @@ public unsafe ref struct TreeWalker
            switch(child->Kind)
             {
                 case ElementKind.Stack:
-                    DfsInternal(child->GetStack());
+                    DfsInternal(child->GetStack(),sp+4);
                     break;
                 case ElementKind.Rectangle:
-                    DfsInternal(child->GetRect());
+                    DfsInternal(child->GetRect(),sp+4);
                     break;
                 default:
                     throw new NotImplementedException();

@@ -15,7 +15,7 @@ public unsafe interface IUIElement<T> where T: struct, IUIElement<T>
     ElementKind Kind { get; }
     ChildInfo* ChildNode { get; set; }
     void* Address {get;internal set;}
-    public T Add<G>(ref G child) where G : struct, IUIElement<G>;
+    public T Add<G>(G child) where G : struct, IUIElement<G>;
 }
 
 
