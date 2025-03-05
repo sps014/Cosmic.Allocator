@@ -59,10 +59,11 @@ public unsafe ref struct Cosmic
         var rect = CreateElement<Rectangle>(rectPtr);
         return ref *rect;
     }
-    public static ref Stack Stack()
+    public static ref Stack Stack(LayoutDirection layoutDirection=LayoutDirection.LeftToRight)
     {
         var stackPtr = StackArena->Alloc((nuint)sizeof(Stack));
         var stack = CreateElement<Stack>(stackPtr);
+        stack->Direction = layoutDirection;
         return ref *stack;
     }
 
@@ -75,6 +76,7 @@ public unsafe ref struct Cosmic
         type->ChildNode = null;
         type->Size = new Size();
         type->Position = new Point();
+        type->Direction = LayoutDirection.LeftToRight;
         return type;
     }
 

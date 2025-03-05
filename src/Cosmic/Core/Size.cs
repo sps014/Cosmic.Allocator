@@ -8,21 +8,35 @@ namespace Cosmic.Core;
 
 public struct Size : IEquatable<Size>
 {
-    public SizeMode SizeMode = SizeMode.Fit;
+    public SizeMode SizeMode;
     public double Width { get; set; }
     public double Height { get; set; }
-    public double MaximumWidth { get; set; } = -1;
-    public double MaximumHeight { get; set; } = -1;
-    public double MinimumWidth { get; set; } = -1;
-    public double MinimumHeight { get; set; } = -1;
+    public double MaximumWidth { get; set; }
+    public double MaximumHeight { get; set; }
+    public double MinimumWidth { get; set; }
+    public double MinimumHeight { get; set; }
+
+    public Size()
+    {
+        SizeMode=SizeMode.Fit;
+        Width = -1;
+        Height = -1;
+        MaximumWidth = -1;
+        MaximumHeight = -1;
+        MinimumWidth = -1;
+        MinimumHeight = -1;
+
+    }
 
     public Size(double width, double height)
     {
+        SizeMode = SizeMode.Fit;
         Width = width;
         Height = height;
     }
     public Size(double width, double height, double minWidth, double minHeight)
     {
+        SizeMode = SizeMode.Fit;
         Width = width;
         Height = height;
         MinimumWidth = minWidth;
@@ -30,6 +44,7 @@ public struct Size : IEquatable<Size>
     }
     public Size(double width, double height, double minWidth, double minHeight, double maxWidth, double maxHeight)
     {
+        SizeMode = SizeMode.Fit;
         Width = width;
         Height = height;
         MinimumWidth = minWidth;

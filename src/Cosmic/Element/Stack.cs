@@ -11,10 +11,10 @@ namespace Cosmic.Element;
 
 public unsafe struct Stack : IUIElement<Stack>
 {
+    public readonly ElementKind Kind => ElementKind.Stack;
+    public LayoutDirection Direction { get; set; }
     public Point Position { get; set; }
     public Size Size { get; set; }
-
-    public readonly ElementKind Kind => ElementKind.Stack;
 
     public long IntenalId { get; set; }
     public ChildInfo* ChildNode { get;set;}
@@ -22,7 +22,12 @@ public unsafe struct Stack : IUIElement<Stack>
 
     public Stack Add<G>(G child) where G : struct, IUIElement<G>
     {
-        return SharedUIElement.Add(ref this, child);
+        return SharedUILogic.Add(ref this, child);
+    }
+    public Stack Orientation(LayoutDirection layoutDirection)
+    {
+        Direction = layoutDirection;
+        return this;
     }
 
 }

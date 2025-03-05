@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Cosmic.Element;
 
-internal ref struct SharedUIElement
+internal ref struct SharedUILogic
 {
     internal unsafe static T Add<T,G>(ref T current,G child) where G : struct, IUIElement<G> where T : struct,IUIElement<T>
     {
