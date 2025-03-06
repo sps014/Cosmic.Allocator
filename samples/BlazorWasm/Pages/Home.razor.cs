@@ -13,7 +13,7 @@ public partial class Home
         {
             var arena = ArenaManager.Create(10 * 1024 * 1024); //10 MB
             Initialize(Cosmic.MemoryUsage.High);
-            var root = Stack().Add(ref Rectangle());
+            var root = Stack().Add(Rectangle());
             TreeWalker.Init(ref root);
             TreeWalker.Dfs();
             Dispose();

@@ -16,6 +16,14 @@
 
 	<ItemGroup>
 		<None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="true" />
+		<None Include="UIStructReciever.cs" />
+	</ItemGroup>
+
+	<!--Manual linking file as SG can't contain files-->
+	<ItemGroup>
+		<Compile Include="..\Cosmic\Attributes\UIPropertyAttribute.cs" Link="Attributes\UIPropertyAttribute.cs" />
+		<Compile Include="..\Cosmic\Attributes\UIStructAttribute.cs" Link="Attributes\UIStructAttribute.cs" />
+
 	</ItemGroup>
 	
 </Project>

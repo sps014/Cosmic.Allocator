@@ -1,19 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Input;
+﻿using Cosmic.Attributes;
 using Cosmic.Core;
 
 namespace Cosmic.Element;
 
-public unsafe struct Stack : IUIElement<Stack>
+[UIStruct]
+public unsafe partial struct Stack : IUIElement<Stack>
 {
     public readonly ElementKind Kind => ElementKind.Stack;
+
+    [UIProperty]
     public LayoutDirection direction { get; set; }
+
+    [UIProperty]
     public Point position { get; set; }
+
+    [UIProperty]
     public Size size { get; set; }
 
     public long IntenalId { get; set; }
