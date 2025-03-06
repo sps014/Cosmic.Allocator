@@ -18,7 +18,7 @@ public unsafe ref struct TreeWalker
 
         DfsInternal(Root);
     }
-    public static void DfsInternal<T>(T* current,int sp =0) where T : unmanaged,IUIElement<T> 
+    private static void DfsInternal<T>(T* current,int sp =0) where T : unmanaged,IUIElement<T> 
     {
         Console.WriteLine("|".PadRight(sp,'_')+" "+typeof(T).Name);
 

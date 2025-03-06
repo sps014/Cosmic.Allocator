@@ -8,4 +8,8 @@
 	<LangVersion>13.0</LangVersion>
   </PropertyGroup>
 
+	<ItemGroup>
+		<ProjectReference Include="..\Cosmic.SourceGenerator\Cosmic.SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+	</ItemGroup>
+
 </Project>
