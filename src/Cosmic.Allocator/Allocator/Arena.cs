@@ -1,11 +1,12 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace Cosmic.Allocator
 {
     /// <summary>
     /// Represents a memory arena for efficient allocation and deallocation of memory blocks.
     /// </summary>
-    public unsafe ref struct Arena : IDisposable
+    public unsafe struct Arena : IDisposable
     {
         /// <summary>
         /// Pointer to the next arena in the chain.
@@ -99,6 +100,70 @@ namespace Cosmic.Allocator
             Next = ArenaManager.CreatePointer(Capacity);
             return Next->Alloc(size);
         }
+
+
+        /// <summary>
+        /// Get a Span over current arena allocated memory
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public Span<T> AsSpan<T>() where T : unmanaged
+        {
+            if(Data==null)
+                return Span<T>.Empty;
+
+            return new Span<T>(Data, (int)Size/sizeof(T));
+        }
+
+        /// <summary>
+        /// Get total Arenas used
+        /// </summary>
+        /// <returns></returns>
+        public int TotalArenaCount()
+        {
+            int count = 0;
+
+            fixed(Arena* arena = &this)
+            {
+                var ptr = arena;
+
+                while(ptr!=null)
+                {
+                    count++;
+                    ptr = ptr->Next;
+                }
+            }
+
+            return count;
+        }
+
+        public unsafe Span<Arena> AllArena()
+        {
+            int ct = TotalArenaCount();
+
+            unsafe 
+            {
+                Arena* arenas = stackalloc Arena[ct];
+
+                int start = 0;
+                
+                fixed(Arena* current  = &this)
+                {
+                    arenas[start] = *current;
+                    var next = Next;
+
+                    while (next != null)
+                    {
+                        arenas[start++] = *next;
+                        next = next->Next;
+                    }
+                }
+
+                return new Span<Arena>(arenas,ct);
+            }
+
+        }
+
 
         /// <summary>
         /// Resets the arena, freeing all allocated memory and setting the size to zero.

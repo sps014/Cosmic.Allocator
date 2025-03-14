@@ -6,6 +6,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<Nullable>enable</Nullable>
+		<LangVersion>13.0</LangVersion>
 	</PropertyGroup>
 
 	<ItemGroup>
