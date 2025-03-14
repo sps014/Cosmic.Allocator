@@ -9,7 +9,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\..\src\Cosmic\Cosmic.csproj" />
+	  <ProjectReference Include="..\..\src\Cosmic.Allocator\Cosmic.Allocator.csproj" />
 	</ItemGroup>
 
 </Project>

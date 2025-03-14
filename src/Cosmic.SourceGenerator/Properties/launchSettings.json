@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "Cosmic SourceGen": {
-      "commandName": "DebugRoslynComponent",
-      "targetProject": "..\\Cosmic\\Cosmic.csproj"
-    }
-  }
-}
