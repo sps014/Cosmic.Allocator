@@ -35,12 +35,12 @@ namespace Cosmic.Allocator
         /// <summary>
         /// Return Safe Arena Handle
         /// </summary>
-        public SafeHandle<Arena> CurrentHandle => AsSafeHandle();
+        public ArenaSafeHandle CurrentHandle => AsSafeHandle();
 
         /// <summary>
         /// Returns Next Arena's Safe Handle, Returns SafeHandle.Zero if no Next Arena linked
         /// </summary>
-        public SafeHandle<Arena> NextArenaHandle=> NextArenaAsSafeHandle();
+        public ArenaSafeHandle NextArenaHandle=> NextArenaAsSafeHandle();
 
         /// <summary>
         /// Return Current Allocated Data in the Arena (Continuous Region)
@@ -187,15 +187,15 @@ namespace Cosmic.Allocator
             }
         }
 
-        private SafeHandle<Arena> AsSafeHandle()
+        private ArenaSafeHandle AsSafeHandle()
         {
-            return new SafeHandle<Arena>((IntPtr)AsPointer());
+            return new ArenaSafeHandle((IntPtr)AsPointer());
         }
 
-        private SafeHandle<Arena> NextArenaAsSafeHandle()
+        private ArenaSafeHandle NextArenaAsSafeHandle()
         {
             if (Next == null)
-                return SafeHandle<Arena>.Zero;
+                return ArenaSafeHandle.Zero;
 
             return Next->AsSafeHandle();
         }
@@ -212,7 +212,7 @@ namespace Cosmic.Allocator
         {
             var nestedArena = AsPointer()->GetArenaByItemIndex(index, sizeof(T), out int byteOffset);
 
-            if (nestedArena == SafeHandle<Arena>.Zero)
+            if (nestedArena == ArenaSafeHandle.Zero)
                 throw new Exception("Invalid Index");
 
             return nestedArena.AsPointer()->DataRegion.GetItem<T>(byteOffset / sizeof(T));
@@ -231,7 +231,7 @@ namespace Cosmic.Allocator
         {
             var nestedArena = AsPointer()->GetArenaByItemIndex(index, sizeof(T), out int byteOffset);
 
-            if (nestedArena == SafeHandle<Arena>.Zero)
+            if (nestedArena == ArenaSafeHandle.Zero)
                 throw new Exception("Invalid Index");
 
             nestedArena.AsPointer()->DataRegion.SetItem(byteOffset / sizeof(T), item);
@@ -280,7 +280,7 @@ namespace Cosmic.Allocator
             Reset();
         }
 
-        public SafeHandle<Arena> GetArenaByItemIndex(int index,int itemSize,out int byteOffset)
+        public ArenaSafeHandle GetArenaByItemIndex(int index,int itemSize,out int byteOffset)
         {
             return ArenaManager.GetArenaByItemIndex(CurrentHandle, index, itemSize, out byteOffset);
         }

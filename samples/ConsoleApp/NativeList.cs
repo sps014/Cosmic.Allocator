@@ -44,7 +44,7 @@ ref struct NativeList<T> : IDisposable where T : unmanaged
         Count--;
     }
 
-    public unsafe void InsertAt(Index index, T data)
+    public void InsertAt(Index index, T data)
     {
         ValidateIndex(index);
 
@@ -79,14 +79,35 @@ ref struct NativeList<T> : IDisposable where T : unmanaged
         set=> arena.SetItemInAll<T>(index.GetOffset(Count), value);
     }
 
-    SafeHandle<Arena> ValidateIndex(Index index)
+    ArenaSafeHandle ValidateIndex(Index index)
     {
         var cur = arena.GetArenaByItemIndex(index.GetOffset(Count), ItemSize, out int indexInArena);
 
-        if (indexInArena == -1 || cur == SafeHandle<Arena>.Zero)
+        if (indexInArena == -1 || cur == ArenaSafeHandle.Zero)
             throw new IndexOutOfRangeException();
 
         return cur;
+    }
+
+    public void IterateAll()
+    {
+        ArenaSafeHandle currentArenaHandle = arena.CurrentHandle;
+
+        do
+        {
+            var intSpan = currentArenaHandle.DataRegion.AsSpan<T>(); // read all memory block as Span
+                                                                      //do anything with span data of a given Arena
+
+            foreach (T i in intSpan)
+            {
+                Console.WriteLine(i);
+            }
+
+
+            //Proceed to next Arena node to read it also
+            currentArenaHandle = currentArenaHandle.NextHandle;
+        }
+        while (currentArenaHandle != ArenaSafeHandle.Zero);
     }
 }
 

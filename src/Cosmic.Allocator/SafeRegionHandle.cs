@@ -37,7 +37,7 @@ public readonly struct SafeRegionHandle
     /// <returns></returns>
     public unsafe Span<T> AsSpan<T>() where T : unmanaged
     {
-        return new Span<T>((void*)Address, Size);
+        return new Span<T>((void*)Address, Size/sizeof(T));
     }
 
     /// <summary>
