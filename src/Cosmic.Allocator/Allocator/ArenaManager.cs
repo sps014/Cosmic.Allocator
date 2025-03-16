@@ -52,16 +52,16 @@ namespace Cosmic.Allocator
             int byteOffsetToIndex = index*itemSize;
             do
             {
-                int size = (int)cur->Capacity;
+                int capacity = (int)cur->Capacity;
 
-                if(byteOffsetToIndex<size)
+                if(byteOffsetToIndex<capacity)
                 {
                     byteOffset = byteOffsetToIndex;
                     return cur->CurrentHandle;
                 }
 
                 cur = cur->Next;
-                byteOffsetToIndex-=size;
+                byteOffsetToIndex-=capacity;
 
             }
             while(cur->CurrentHandle!=SafeHandle<Arena>.Zero);

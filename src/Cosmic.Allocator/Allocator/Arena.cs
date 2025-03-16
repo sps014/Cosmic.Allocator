@@ -125,6 +125,25 @@ namespace Cosmic.Allocator
 
 
         /// <summary>
+        /// Reduce the Size pointer  (it doesn't dealloc memory) , <i>should not be used unless you know what you are doing.</i>
+        /// </summary>
+        /// <param name="size">amount to decrement</param>
+        public void Reduce(nuint size)
+        {
+        
+            if(size > Capacity)
+                throw new OutOfMemoryException("Can't reduce more than the size or capacity");
+
+            if (size > Size)
+            {
+                Size = 0;
+                return;
+            }
+
+            Size = Size - size;
+        }
+
+        /// <summary>
         /// Get a Span over current arena allocated memory
         /// </summary>
         /// <typeparam name="T"></typeparam>
@@ -261,9 +280,9 @@ namespace Cosmic.Allocator
             Reset();
         }
 
-        public SafeHandle<Arena> GetArenaByItemIndex(int index,int itemSize,out int indexInArena)
+        public SafeHandle<Arena> GetArenaByItemIndex(int index,int itemSize,out int byteOffset)
         {
-            return ArenaManager.GetArenaByItemIndex(CurrentHandle, index, itemSize, out indexInArena);
+            return ArenaManager.GetArenaByItemIndex(CurrentHandle, index, itemSize, out byteOffset);
         }
 
         /// <summary>

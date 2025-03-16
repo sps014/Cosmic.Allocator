@@ -4,7 +4,7 @@ using Cosmic.Allocator;
 ref struct NativeList<T> : IDisposable where T : unmanaged
 {
     Arena arena;
-    public int Length { get; private set; }
+    public int Count { get; private set; }
     private int ItemSize { get; }
 
     public NativeList()
@@ -17,7 +17,7 @@ ref struct NativeList<T> : IDisposable where T : unmanaged
     {
         Span<T> t = arena.Alloc<T>(1);
         t[0] = data;
-        Length++;
+        Count++;
     }
 
     T GetItem(int index)
@@ -25,9 +25,47 @@ ref struct NativeList<T> : IDisposable where T : unmanaged
         return arena.GetItemInAll<T>(index);
     }
 
-    public void Set(int index,T item)
+    public unsafe void RemoveAt(Index index)
     {
-        arena.SetItemInAll(index,item);
+        ValidateIndex(index);
+
+        int id = index.GetOffset(Count);
+
+        //shift all items in arena after index
+        for(int i = id; i <Count-1; i++)
+        {
+            var nextVal = this[i+1];
+            Set(i, nextVal);
+        }
+
+        var cur = ValidateIndex(Count);
+
+        cur.AsPointer()->Reduce((nuint)ItemSize);
+        Count--;
+    }
+
+    public unsafe void InsertAt(Index index, T data)
+    {
+        ValidateIndex(index);
+
+        //add some space in end for shifting values one place
+        Add(data);
+
+        int id = index.GetOffset(Count);
+
+        // shift all items in arena after index
+        for (int i = Count-1; i > id; i--)
+        {
+            var prevVal = this[i - 1];
+            Set(i, prevVal);
+        }
+
+        Set(id,data);
+    }
+
+    public void Set(Index index,T item)
+    {
+        arena.SetItemInAll(index.GetOffset(Count),item);
     }
 
     public void Dispose()
@@ -37,7 +75,18 @@ ref struct NativeList<T> : IDisposable where T : unmanaged
 
     public T this[Index index]
     {
-        get => GetItem(index.GetOffset(Length));
+        get => GetItem(index.GetOffset(Count));
+        set=> arena.SetItemInAll<T>(index.GetOffset(Count), value);
+    }
+
+    SafeHandle<Arena> ValidateIndex(Index index)
+    {
+        var cur = arena.GetArenaByItemIndex(index.GetOffset(Count), ItemSize, out int indexInArena);
+
+        if (indexInArena == -1 || cur == SafeHandle<Arena>.Zero)
+            throw new IndexOutOfRangeException();
+
+        return cur;
     }
 }
 
