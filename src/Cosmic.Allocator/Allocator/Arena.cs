@@ -176,6 +176,43 @@ namespace Cosmic.Allocator
 
 
         /// <summary>
+        /// Get the Item by global index (can be in any nested arenas)
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="index">global index of item</param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        public T GetItemInAll<T>(int index) where T : unmanaged
+        {
+            var nestedArena = AsPointer()->GetArenaByItemIndex(index, sizeof(T), out int byteOffset);
+
+            if (nestedArena == SafeHandle<Arena>.Zero)
+                throw new Exception("Invalid Index");
+
+            return nestedArena.AsPointer()->DataRegion.GetItem<T>(byteOffset / sizeof(T));
+
+        }
+
+
+        /// <summary>
+        /// Set the Item by global index (can be in any nested arenas)
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="index">global index of item, can be in any nested arena</param>
+        /// <param name="item"></param>
+        /// <exception cref="Exception"></exception>
+        public void SetItemInAll<T>(int index, T item) where T : unmanaged
+        {
+            var nestedArena = AsPointer()->GetArenaByItemIndex(index, sizeof(T), out int byteOffset);
+
+            if (nestedArena == SafeHandle<Arena>.Zero)
+                throw new Exception("Invalid Index");
+
+            nestedArena.AsPointer()->DataRegion.SetItem<T>(byteOffset / sizeof(T), item);
+        }
+
+
+        /// <summary>
         /// Resets the arena, freeing all allocated memory and setting the size to zero.
         /// </summary>
         public void Reset()

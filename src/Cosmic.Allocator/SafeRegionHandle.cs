@@ -35,11 +35,24 @@ public readonly struct SafeRegionHandle
         Size = size;
     }
 
+
+    /// <summary>
+    /// Returns item of current arena as span
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
     public unsafe Span<T> AsSpan<T>() where T : unmanaged
     {
         return new Span<T>((void*)Address, Size);
     }
 
+    /// <summary>
+    /// Set item at local index <b>in current Arena only</b>
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="index">local index specific to this arena</param>
+    /// <param name="item"></param>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
     public void SetItem<T>(int index,T item) where T : unmanaged
     {
         if(index < 0 || index>=Size)
@@ -49,6 +62,13 @@ public readonly struct SafeRegionHandle
         span[index] = item;
     }
 
+    /// <summary>
+    /// Get item at local index <b>in current Arena only</b>
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="index">local index specific to this arena</param>
+    /// <returns>Item</returns>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
     public T GetItem<T>(int index) where T : unmanaged
     {
         if (index < 0 || index >= Size)

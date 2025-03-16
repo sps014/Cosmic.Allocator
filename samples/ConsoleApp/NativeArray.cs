@@ -21,23 +21,12 @@ unsafe ref struct NativeArray<T> : IDisposable where T : unmanaged
 
     T GetItem(int index)
     {
-        var nestedArena = arena.AsPointer()->GetArenaByItemIndex(index, ItemSize, out int byteOffset);
-
-        if (nestedArena == SafeHandle<Arena>.Zero)
-            throw new Exception("Invalid Index");
-
-        return nestedArena.AsPointer()->DataRegion.GetItem<T>(byteOffset / ItemSize);
-
+        return arena.GetItemInAll<T>(index);
     }
 
     public void Set(int index,T item)
     {
-        var nestedArena = arena.AsPointer()->GetArenaByItemIndex(index, ItemSize, out int byteOffset);
-
-        if (nestedArena == SafeHandle<Arena>.Zero)
-            throw new Exception("Invalid Index");
-
-        nestedArena.AsPointer()->DataRegion.SetItem<T>(byteOffset / ItemSize,item);
+        arena.SetItemInAll(index,item);
     }
 
     public void Dispose()
