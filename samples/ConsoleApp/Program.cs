@@ -15,8 +15,6 @@
     pointList.InsertAt(^1, new Point(-2, -2));
     //pointList.RemoveAt(^1);
 
-    pointList.IterateAll();
-
 
 
     //for (int i = 0; i < pointList.Count; i++)
