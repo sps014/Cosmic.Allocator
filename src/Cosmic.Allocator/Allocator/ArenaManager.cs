@@ -12,8 +12,11 @@ namespace Cosmic.Allocator
         /// </summary>
         /// <param name="capacity">The capacity of the memory block to allocate.</param>
         /// <returns>A pointer to the newly created arena.</returns>
-        internal static Arena* CreatePointer(nuint capacity)
+        public static Arena* CreatePointer(nuint capacity)
         {
+            if (capacity == 0)
+                throw new Exception("Arena size can't be 0");
+
             Arena* arena = (Arena*)NativeMemory.Alloc((nuint)sizeof(Arena));
             arena->Capacity = capacity;
             arena->Next = null;

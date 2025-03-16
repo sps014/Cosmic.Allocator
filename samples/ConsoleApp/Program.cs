@@ -9,39 +9,34 @@ using System.Collections;
     Console.WriteLine(data[0].ToString());
 
 
-    using List<Point> point = new List<Point>();
+    using NativeArray<Point> point = new NativeArray<Point>();
 
-    point.Add(new Point()
+    for(int i=0;i<1000;i++)
     {
-        X = 10,
-        Y = 10
-    });
-    point.Add(new Point()
-    {
-        X = 5,
-        Y = 5
-    });
-    point.Add(new Point()
-    {
-        X = 3,
-        Y = 2
-    });
+        point.Add(new Point()
+        {
+            X = 10+i,
+            Y = 10+i
+        });
+    }
 
-    foreach(var item in point.AsSpan())
+
+    for (int i = 0; i < point.Length; i++)
     {
-        Console.WriteLine(item.ToString());
+        var pt = point[i];
+        Console.WriteLine(pt.ToString());
     }
 }
 
-unsafe ref struct List<T>: IDisposable where T : unmanaged
+unsafe ref struct NativeArray<T> : IDisposable where T : unmanaged
 {
     Arena arena;
     public int Length { get; private set; }
     private int ItemSize { get; }
-    public List()
+    public NativeArray()
     {
         ItemSize = sizeof(T);
-        arena = ArenaManager.Create((nuint)(1000 * ItemSize));
+        arena = ArenaManager.Create((nuint)(100 * ItemSize));
     }
 
     public void Add(T data)
@@ -50,15 +45,15 @@ unsafe ref struct List<T>: IDisposable where T : unmanaged
         t.Fill(data);
         Length++;
     }
-
-    public Span<T> AsSpan()
-    {
-        return arena.AsSpan<T>();
-    }
-
     public void Dispose()
     {
         arena.Dispose();
+    }
+
+    public T this[Index index]
+    {
+        get => arena.DataRegion.GetItem<T>(index.GetOffset(Length));
+        set => arena.DataRegion.SetItem(index.GetOffset(Length),value);
     }
 }
 

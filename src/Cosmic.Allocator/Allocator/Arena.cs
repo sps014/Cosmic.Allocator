@@ -29,6 +29,21 @@ namespace Cosmic.Allocator
         public nuint Size { get; internal set; }
 
         /// <summary>
+        /// Return Safe Arena Handle
+        /// </summary>
+        public SafeHandle<Arena> CurrentHandle => AsSafeHandle();
+
+        /// <summary>
+        /// Returns Next Arena's Safe Handle, Returns SafeHandle.Zero if no Next Arena linked
+        /// </summary>
+        public SafeHandle<Arena> NextArenaHandle=> NextArenaAsSafeHandle();
+
+        /// <summary>
+        /// Return Current Allocated Data in the Arena (Continuous Region)
+        /// </summary>
+        public SafeRegionHandle DataRegion => new SafeRegionHandle(Data, (int)Size);
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="Arena"/> struct with no capacity.
         /// <br></br><b><i>Note: A new arena should be created using the ArenaManager instead of direct constructor call.</i></b>
         /// </summary>
@@ -137,31 +152,26 @@ namespace Cosmic.Allocator
             return count;
         }
 
-        public unsafe Span<Arena> AllArena()
+        //Return the Current Arena as Pointer
+        public Arena* AsPointer()
         {
-            int ct = TotalArenaCount();
-
-            unsafe 
+            fixed (Arena* arena = &this)
             {
-                Arena* arenas = stackalloc Arena[ct];
-
-                int start = 0;
-                
-                fixed(Arena* current  = &this)
-                {
-                    arenas[start] = *current;
-                    var next = Next;
-
-                    while (next != null)
-                    {
-                        arenas[start++] = *next;
-                        next = next->Next;
-                    }
-                }
-
-                return new Span<Arena>(arenas,ct);
+                return arena;
             }
+        }
 
+        private SafeHandle<Arena> AsSafeHandle()
+        {
+            return new SafeHandle<Arena>((IntPtr)AsPointer());
+        }
+
+        private SafeHandle<Arena> NextArenaAsSafeHandle()
+        {
+            if (Next == null)
+                return SafeHandle<Arena>.Zero;
+
+            return Next->AsSafeHandle();
         }
 
 
