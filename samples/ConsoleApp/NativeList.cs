@@ -88,26 +88,5 @@ ref struct NativeList<T> : IDisposable where T : unmanaged
 
         return cur;
     }
-
-    public void IterateAll()
-    {
-        ArenaSafeHandle currentArenaHandle = arena.CurrentHandle;
-
-        do
-        {
-            var intSpan = currentArenaHandle.DataRegion.AsSpan<T>(); // read all memory block as Span
-                                                                      //do anything with span data of a given Arena
-
-            foreach (T i in intSpan)
-            {
-                Console.WriteLine(i);
-            }
-
-
-            //Proceed to next Arena node to read it also
-            currentArenaHandle = currentArenaHandle.NextHandle;
-        }
-        while (currentArenaHandle != ArenaSafeHandle.Zero);
-    }
 }
 

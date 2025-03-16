@@ -63,8 +63,11 @@ Above code doesn't retrieve the memory of all nested arena, it only returns curr
      do
      {
          var intSpans = currentArenaHandle.DataRegion.AsSpan<int>(); // read all memory block as Span
-         //do anything with span data of a given Arena
-         
+        //do anything with span data of a given Arena
+        foreach (int i in intSpan)
+        {
+            Console.WriteLine(i);
+        }
 
          //Proceed to next Arena node to read it also
          currentArenaHandle = currentArenaHandle.NextHandle;
@@ -76,12 +79,48 @@ Above code doesn't retrieve the memory of all nested arena, it only returns curr
 or go unsafe
 
 ```cs
+public unsafe void IterateAllMemory()
+{
+    Arena* currentArena = arena.AsPointer();
 
+    do
+    {
+        var intSpan = currentArena->AsSpan<int>(); // read all memory block as Span
+        //do anything with span data of a given Arena
+
+        foreach (int i in intSpan)
+        {
+            Console.WriteLine(i);
+        }
+
+
+        //Proceed to next Arena node to read it also
+        currentArena = currentArena->Next;
+    }
+    while (currentArena != null);
+}
 
 ```
 
 Please see the diagram below for clarity of the code.
 
+
+#### Get and Set By Index item in homogenous data including all linked arena
+
+If data type of all the allocated data is same then we can get and set item by index easily across linked arenas with 
+
+```cs
+    var item =  arena.GetItemInAll<T>(index); // here all arenas are considered to be combined so indexing will work across arenas even though the are disconnected
+
+    arena.SetItemInAll(index,item); //similary are lined arenas are considered to be single combined
+
+```
+
+#### Reduce the size of a arena
+
+```cs
+arena.Reduce(10); // decrease size of Arena by 10 bytes (doesn't deallocate memory only decrement the counter)
+```
     
 #### No Linked Arena'a
 By default as per demand new arena's will be created.
@@ -100,6 +139,7 @@ if(arena.Size+newAllocationSize<=arena.Capacity)
 
 //moreMem allocation won't happen in this case as we have no memory , without this check this allocation will happen in a newly created linked Arena
 ```
+
 
 #### Manual Memory Deallocation
 
