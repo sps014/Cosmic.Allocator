@@ -7,7 +7,7 @@
 * Via Nuget Package Manager
 * Via Command Line
      ```
-     dotnet add package Cosmic.Allocator
+     dotnet add package CosmicAllocator
      ```
 
 
