@@ -27,13 +27,13 @@ jobs:
         dotnet-version: 8.0.x
 
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore src/Cosmic.Allocator/Cosmic.Allocator.csproj
 
     - name: Build project
-      run: dotnet build --configuration Release
+      run: dotnet build src/Cosmic.Allocator/Cosmic.Allocator.csproj --configuration Release
 
     - name: Pack NuGet package
-      run: dotnet pack --configuration Release --output ./nupkgs
+      run: dotnet pack src/Cosmic.Allocator/Cosmic.Allocator.csproj --configuration Release --output ./nupkgs
       
     - name: Publish to NuGet
       run: dotnet nuget push **/*.nupkg -s "https://api.nuget.org/v3/index.json" -k ${{ secrets.NUGET_API_KEY }} --skip-duplicate
