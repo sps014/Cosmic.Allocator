@@ -14,6 +14,11 @@ namespace Cosmic.Allocator
         public Arena* Next { get; internal set; }
 
         /// <summary>
+        /// Pointer to the next arena in the chain.
+        /// </summary>
+        public Arena* Previous { get; internal set; }
+
+        /// <summary>
         /// Pointer to the allocated memory block.
         /// </summary>
         public void* Data { get; internal set; }
@@ -53,6 +58,7 @@ namespace Cosmic.Allocator
             Size = 0;
             Data = null;
             Next = null;
+            Previous = null;
         }
 
         /// <summary>
@@ -65,6 +71,7 @@ namespace Cosmic.Allocator
             Size = 0;
             Data = NativeMemory.Alloc(capacity);
             Next = null;
+            Previous = null;
         }
 
         /// <summary>
@@ -113,6 +120,7 @@ namespace Cosmic.Allocator
 
             // If there is no next arena, create a new one and allocate from it
             Next = ArenaManager.CreatePointer(Capacity);
+            Next->Previous = AsPointer();
             return Next->Alloc(size);
         }
 
@@ -176,7 +184,7 @@ namespace Cosmic.Allocator
 
 
         /// <summary>
-        /// Get the Item by global index (can be in any nested arenas)
+        /// Get the Item by global index (can be in any nested arenas), <b> should be called on first node of Arena</b>
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="index">global index of item</param>
@@ -195,7 +203,7 @@ namespace Cosmic.Allocator
 
 
         /// <summary>
-        /// Set the Item by global index (can be in any nested arenas)
+        /// Set the Item by global index (can be in any nested arenas) <b> should be called on first node of Arena</b>
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="index">global index of item, can be in any nested arena</param>
