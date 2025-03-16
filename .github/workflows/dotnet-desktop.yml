@@ -1,9 +1,7 @@
 name: .NET Nuget Publish
 
 on:
-   push:
-    branches:
-      - main
+  workflow_dispatch:
 
 jobs:
 
@@ -38,4 +36,4 @@ jobs:
       run: dotnet pack --configuration Release --output ./nupkgs
       
     - name: Publish to NuGet
-      run: dotnet nuget push ./src/Cosmic/Cosmic.Allocator/nupkgs/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+      run: dotnet nuget push ./src/Cosmic.Allocator/nupkgs/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
