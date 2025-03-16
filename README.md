@@ -3,6 +3,15 @@
 
 ### Usage
 
+### Install
+* Via Nuget Package Manager
+* Via Command Line
+     ```
+     dotnet add package Cosmic.Allocator
+     ```
+
+
+
 #### Creating an Arena
 
 ```cs
