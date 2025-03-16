@@ -2,22 +2,13 @@
 using System.Collections;
 
 {
-    using Arena arena = ArenaManager.Create(10240);
-    var data = arena.Alloc<Point>();
-    data[0].Y = 10;
-    data[0].X = 5;
-    Console.WriteLine(data[0].ToString());
 
 
     using NativeArray<Point> point = new NativeArray<Point>();
 
-    for(int i=0;i<1000;i++)
+    for(int i=0;i<4009;i++)
     {
-        point.Add(new Point()
-        {
-            X = 10+i,
-            Y = 10+i
-        });
+        point.Add(new Point(i,i));
     }
 
 
@@ -33,17 +24,35 @@ unsafe ref struct NativeArray<T> : IDisposable where T : unmanaged
     Arena arena;
     public int Length { get; private set; }
     private int ItemSize { get; }
+
+    SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1,1);
     public NativeArray()
     {
         ItemSize = sizeof(T);
-        arena = ArenaManager.Create((nuint)(100 * ItemSize));
+        arena = ArenaManager.Create((nuint)(ItemSize)*4);
     }
 
-    public void Add(T data)
+    public unsafe void Add(T data)
     {
-        var t = arena.Alloc<T>();
-        t.Fill(data);
-        Length++;
+        semaphoreSlim.Wait();
+        unsafe
+        {
+            T* t = (T*)arena.Alloc((nuint)sizeof(T));
+            *t = data;
+            Length++;
+        }
+        semaphoreSlim.Release();
+    }
+
+    unsafe T GetItem(int index)
+    {
+        var nestedArena = ArenaManager.GetArenaByIndex(arena.AsPointer()->CurrentHandle,index, ItemSize, out int offset);
+
+        if (nestedArena == SafeHandle<Arena>.Zero)
+            throw new Exception("Invalid Index");
+
+        return nestedArena.AsPointer()->DataRegion.GetItem<T>(offset/ItemSize);
+
     }
     public void Dispose()
     {
@@ -52,7 +61,7 @@ unsafe ref struct NativeArray<T> : IDisposable where T : unmanaged
 
     public T this[Index index]
     {
-        get => arena.DataRegion.GetItem<T>(index.GetOffset(Length));
+        get => GetItem(index.GetOffset(Length));
         set => arena.DataRegion.SetItem(index.GetOffset(Length),value);
     }
 }
@@ -61,6 +70,11 @@ struct Point
 {
     public int X { get; set; }
     public int Y { get; set; }
+
+    public Point(int x, int y)
+    {
+        X = x; Y = y;
+    }
 
     public override string ToString()
     {
