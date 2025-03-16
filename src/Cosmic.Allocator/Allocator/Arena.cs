@@ -217,6 +217,11 @@ namespace Cosmic.Allocator
             Reset();
         }
 
+        public SafeHandle<Arena> GetArenaByItemIndex(int index,int itemSize,out int indexInArena)
+        {
+            return ArenaManager.GetArenaByItemIndex(CurrentHandle, index, itemSize, out indexInArena);
+        }
+
         /// <summary>
         /// Disposes the arena, freeing all allocated memory.
         /// </summary>

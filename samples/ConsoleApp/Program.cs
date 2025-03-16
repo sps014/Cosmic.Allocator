@@ -4,17 +4,19 @@ using System.Collections;
 {
 
 
-    using NativeArray<Point> point = new NativeArray<Point>();
+    using NativeArray<Point> pointArray = new NativeArray<Point>();
 
     for(int i=0;i<4009;i++)
     {
-        point.Add(new Point(i,i));
+        pointArray.Add(new Point(i,i));
     }
 
+    pointArray.Set(4008, new Point(1, 1));
 
-    for (int i = 0; i < point.Length; i++)
+
+    for (int i = 0; i < pointArray.Length; i++)
     {
-        var pt = point[i];
+        var pt = pointArray[i];
         Console.WriteLine(pt.ToString());
     }
 }
@@ -25,35 +27,40 @@ unsafe ref struct NativeArray<T> : IDisposable where T : unmanaged
     public int Length { get; private set; }
     private int ItemSize { get; }
 
-    SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1,1);
     public NativeArray()
     {
         ItemSize = sizeof(T);
         arena = ArenaManager.Create((nuint)(ItemSize)*4);
     }
 
-    public unsafe void Add(T data)
+    public void Add(T data)
     {
-        semaphoreSlim.Wait();
-        unsafe
-        {
-            T* t = (T*)arena.Alloc((nuint)sizeof(T));
-            *t = data;
-            Length++;
-        }
-        semaphoreSlim.Release();
+        Span<T> t = arena.Alloc<T>(1);
+        t[0] = data;
+        Length++;
     }
 
-    unsafe T GetItem(int index)
+    T GetItem(int index)
     {
-        var nestedArena = ArenaManager.GetArenaByIndex(arena.AsPointer()->CurrentHandle,index, ItemSize, out int offset);
+        var nestedArena = arena.AsPointer()->GetArenaByItemIndex(index, ItemSize, out int byteOffset);
 
         if (nestedArena == SafeHandle<Arena>.Zero)
             throw new Exception("Invalid Index");
 
-        return nestedArena.AsPointer()->DataRegion.GetItem<T>(offset/ItemSize);
+        return nestedArena.AsPointer()->DataRegion.GetItem<T>(byteOffset / ItemSize);
 
     }
+
+    public void Set(int index,T item)
+    {
+        var nestedArena = arena.AsPointer()->GetArenaByItemIndex(index, ItemSize, out int byteOffset);
+
+        if (nestedArena == SafeHandle<Arena>.Zero)
+            throw new Exception("Invalid Index");
+
+        nestedArena.AsPointer()->DataRegion.SetItem<T>(byteOffset / ItemSize,item);
+    }
+
     public void Dispose()
     {
         arena.Dispose();
@@ -62,7 +69,6 @@ unsafe ref struct NativeArray<T> : IDisposable where T : unmanaged
     public T this[Index index]
     {
         get => GetItem(index.GetOffset(Length));
-        set => arena.DataRegion.SetItem(index.GetOffset(Length),value);
     }
 }
 

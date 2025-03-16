@@ -40,14 +40,14 @@ namespace Cosmic.Allocator
             return arena;
         }
 
-        public static unsafe SafeHandle<Arena> GetArenaByIndex(SafeHandle<Arena> arenaSafeHandle,int index,int itemSize,out int offset)
+        public static unsafe SafeHandle<Arena> GetArenaByItemIndex(SafeHandle<Arena> arenaSafeHandle,int index,int itemSize,out int byteOffset)
         {
-            offset = -1;
+            byteOffset = -1;
 
             if (arenaSafeHandle == SafeHandle<Arena>.Zero)
                 return SafeHandle<Arena>.Zero;
 
-            var cur = arenaSafeHandle.AsPointer();
+            Arena* cur = arenaSafeHandle.AsPointer();
             int byteOffsetToIndex = index*itemSize;
             do
             {
@@ -55,7 +55,7 @@ namespace Cosmic.Allocator
 
                 if(byteOffsetToIndex<size)
                 {
-                    offset = byteOffsetToIndex;
+                    byteOffset = byteOffsetToIndex;
                     return cur->CurrentHandle;
                 }
 
