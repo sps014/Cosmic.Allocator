@@ -1,5 +1,5 @@
 # Cosmic Arena Allocator
- High performance Arena allocator for C#.
+ High performance Arena allocator for C#. Say good bye to Garbage collector. 
 
 ### Usage
 

@@ -1,10 +1,22 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-	<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-	<LangVersion>13.0</LangVersion>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<LangVersion>13.0</LangVersion>
+		<Title>Cosmic.Allocator</Title>
+		<Authors>sps014</Authors>
+		<Description>A High perfromance Arena allocator for C#.</Description>
+		<RepositoryUrl>https://github.com/sps014/Cosmic.Allocator</RepositoryUrl>
+		<PackageProjectUrl>https://github.com/sps014/Cosmic.Allocator</PackageProjectUrl>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="..\..\README.md" Pack="true" PackagePath=".\"/>
+	</ItemGroup>
+
 </Project>
