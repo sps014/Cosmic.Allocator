@@ -1,14 +1,15 @@
-﻿using Cosmic.Allocator;
+﻿using System.Runtime.CompilerServices;
+using Cosmic.Allocator;
 
-unsafe ref struct NativeArray<T> : IDisposable where T : unmanaged
+ref struct NativeList<T> : IDisposable where T : unmanaged
 {
     Arena arena;
     public int Length { get; private set; }
     private int ItemSize { get; }
 
-    public NativeArray()
+    public NativeList()
     {
-        ItemSize = sizeof(T);
+        ItemSize = Unsafe.SizeOf<T>();
         arena = ArenaManager.Create((nuint)(ItemSize)*4);
     }
 

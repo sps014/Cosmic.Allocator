@@ -208,7 +208,7 @@ namespace Cosmic.Allocator
             if (nestedArena == SafeHandle<Arena>.Zero)
                 throw new Exception("Invalid Index");
 
-            nestedArena.AsPointer()->DataRegion.SetItem<T>(byteOffset / sizeof(T), item);
+            nestedArena.AsPointer()->DataRegion.SetItem(byteOffset / sizeof(T), item);
         }
 
 

@@ -2,8 +2,7 @@
 
 {
 
-
-    using NativeArray<Point> pointArray = new NativeArray<Point>();
+    using NativeList<Point> pointArray = new NativeList<Point>();
 
     for(int i=0;i<4009;i++)
     {
