@@ -20,6 +20,7 @@ namespace Cosmic.Allocator
             Arena* arena = (Arena*)NativeMemory.Alloc((nuint)sizeof(Arena));
             arena->Capacity = capacity;
             arena->Next = null;
+            arena->Previous = null;
             arena->Size = 0;
             arena->Data = NativeMemory.Alloc(capacity);
             return arena;
