@@ -3,14 +3,14 @@ using Cosmic.Allocator;
 
 ref struct NativeList<T> : IDisposable where T : unmanaged
 {
-    Arena arena;
+    ArenaAllocator arena;
     public int Count { get; private set; }
     private int ItemSize { get; }
 
     public NativeList()
     {
         ItemSize = Unsafe.SizeOf<T>();
-        arena = ArenaManager.Create((nuint)(ItemSize)*4);
+        arena = ArenaManager.Create((nuint)(ItemSize)*40);
     }
 
     public void Add(T data)

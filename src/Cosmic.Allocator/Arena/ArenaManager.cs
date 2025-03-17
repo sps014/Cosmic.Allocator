@@ -32,12 +32,12 @@ namespace Cosmic.Allocator
         /// <param name="capacity">The amount of bytes to allocate in the arena. This amount is used if the arena needs to grow.</param>
         /// <returns>A new instance of the <see cref="Arena"/> struct.</returns>
         /// <exception cref="Exception">Thrown when the capacity is zero.</exception>
-        public static Arena Create(nuint capacity)
+        public static ArenaAllocator Create(nuint capacity)
         {
             if (capacity == 0)
                 throw new Exception("Arena size can't be 0");
 
-            var arena = new Arena(capacity);
+            var arena = new ArenaAllocator(capacity);
             return arena;
         }
 

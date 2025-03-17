@@ -33,6 +33,11 @@ namespace Cosmic.Allocator
         public nuint Size { get; internal set; }
 
         /// <summary>
+        /// What is the starting position of arena if all arenas are considered to be continously allocated 
+        /// </summary>
+        public nuint StartingOffset { get; internal set; }
+
+        /// <summary>
         /// Return Safe Arena Handle
         /// </summary>
         public ArenaSafeHandle CurrentHandle => AsSafeHandle();
@@ -53,6 +58,7 @@ namespace Cosmic.Allocator
         /// </summary>
         public Arena()
         {
+            StartingOffset = 0;
             Capacity = 0;
             Size = 0;
             Data = null;
@@ -71,56 +77,7 @@ namespace Cosmic.Allocator
             Data = NativeMemory.Alloc(capacity);
             Next = null;
             Previous = null;
-        }
-
-        /// <summary>
-        /// Allocates memory for the specified number of items of type <typeparamref name="T"/>.
-        /// </summary>
-        /// <typeparam name="T">The type of items to allocate memory for.</typeparam>
-        /// <param name="count">The number of items to allocate memory for. Default is 1.</param>
-        /// <returns>A span of the allocated memory.</returns>
-        /// <exception cref="Exception">Thrown when the item count is zero.</exception>
-        public Span<T> Alloc<T>(uint count = 1) where T : unmanaged
-        {
-            if (count == 0)
-                throw new Exception("Item count can't be equal to 0");
-
-            nuint size = (nuint)sizeof(T) * count;
-            void* ptr = Alloc(size);
-            return new Span<T>(ptr, (int)size);
-        }
-
-        /// <summary>
-        /// Allocates a memory block of the specified size.
-        /// </summary>
-        /// <param name="size">The size of the memory block to allocate.</param>
-        /// <returns>A pointer to the allocated memory block.</returns>
-        /// <exception cref="OutOfMemoryException">Thrown when the allocation size is greater than the capacity.</exception>
-        public void* Alloc(nuint size)
-        {
-            if (size > Capacity)
-            {
-                throw new OutOfMemoryException("Allocation size is greater than capacity");
-            }
-
-            // Check if there is enough capacity in the current arena
-            if (Size + size <= Capacity)
-            {
-                void* result = (byte*)Data + Size;
-                Size += size;
-                return result;
-            }
-
-            // If there is not enough capacity, try the next arena
-            if (Next != null)
-            {
-                return Next->Alloc(size);
-            }
-
-            // If there is no next arena, create a new one and allocate from it
-            Next = ArenaManager.CreatePointer(Capacity);
-            Next->Previous = AsPointer();
-            return Next->Alloc(size);
+            StartingOffset = 0;
         }
 
 
@@ -156,27 +113,6 @@ namespace Cosmic.Allocator
             return new Span<T>(Data, (int)Size/sizeof(T));
         }
 
-        /// <summary>
-        /// Get total Arenas used
-        /// </summary>
-        /// <returns></returns>
-        public int TotalArenaCount()
-        {
-            int count = 0;
-
-            fixed(Arena* arena = &this)
-            {
-                var ptr = arena;
-
-                while(ptr!=null)
-                {
-                    count++;
-                    ptr = ptr->Next;
-                }
-            }
-
-            return count;
-        }
 
         //Return the Current Arena as Pointer
         public Arena* AsPointer()
@@ -198,43 +134,6 @@ namespace Cosmic.Allocator
                 return ArenaSafeHandle.Zero;
 
             return Next->AsSafeHandle();
-        }
-
-
-        /// <summary>
-        /// Get the Item by global index (can be in any nested arenas), <b> should be called on first node of Arena</b>
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="index">global index of item</param>
-        /// <returns></returns>
-        /// <exception cref="Exception"></exception>
-        public T GetItemInAll<T>(int index) where T : unmanaged
-        {
-            var nestedArena = AsPointer()->GetArenaByItemIndex(index, sizeof(T), out int byteOffset);
-
-            if (nestedArena == ArenaSafeHandle.Zero)
-                throw new Exception("Invalid Index");
-
-            return nestedArena.AsPointer()->DataRegion.GetItem<T>(byteOffset / sizeof(T));
-
-        }
-
-
-        /// <summary>
-        /// Set the Item by global index (can be in any nested arenas) <b> should be called on first node of Arena</b>
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="index">global index of item, can be in any nested arena</param>
-        /// <param name="item"></param>
-        /// <exception cref="Exception"></exception>
-        public void SetItemInAll<T>(int index, T item) where T : unmanaged
-        {
-            var nestedArena = AsPointer()->GetArenaByItemIndex(index, sizeof(T), out int byteOffset);
-
-            if (nestedArena == ArenaSafeHandle.Zero)
-                throw new Exception("Invalid Index");
-
-            nestedArena.AsPointer()->DataRegion.SetItem(byteOffset / sizeof(T), item);
         }
 
 
@@ -280,10 +179,6 @@ namespace Cosmic.Allocator
             Reset();
         }
 
-        public ArenaSafeHandle GetArenaByItemIndex(int index,int itemSize,out int byteOffset)
-        {
-            return ArenaManager.GetArenaByItemIndex(CurrentHandle, index, itemSize, out byteOffset);
-        }
 
         /// <summary>
         /// Disposes the arena, freeing all allocated memory.
