@@ -23,6 +23,7 @@ namespace Cosmic.Allocator
             arena->Previous = null;
             arena->Size = 0;
             arena->Data = NativeMemory.Alloc(capacity);
+            arena->Next4 = null;
             return arena;
         }
 
@@ -41,33 +42,7 @@ namespace Cosmic.Allocator
             return arena;
         }
 
-        public static unsafe ArenaSafeHandle GetArenaByItemIndex(ArenaSafeHandle arenaSafeHandle,int index,int itemSize,out int byteOffset)
-        {
-            byteOffset = -1;
-
-            if (arenaSafeHandle == ArenaSafeHandle.Zero)
-                return ArenaSafeHandle.Zero;
-
-            Arena* cur = arenaSafeHandle.AsPointer();
-            int byteOffsetToIndex = index*itemSize;
-            do
-            {
-                int capacity = (int)cur->Capacity;
-
-                if(byteOffsetToIndex<capacity)
-                {
-                    byteOffset = byteOffsetToIndex;
-                    return cur->CurrentHandle;
-                }
-
-                cur = cur->Next;
-                byteOffsetToIndex-=capacity;
-
-            }
-            while(cur->CurrentHandle!=ArenaSafeHandle.Zero);
-
-            return ArenaSafeHandle.Zero;
-        }
+    
 
         /// <summary>
         /// Releases the memory of the specified arena and its subsequent arenas.

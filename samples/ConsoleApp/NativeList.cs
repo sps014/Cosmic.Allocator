@@ -7,10 +7,12 @@ ref struct NativeList<T> : IDisposable where T : unmanaged
     public int Count { get; private set; }
     private int ItemSize { get; }
 
+    private const int ArenaSizeMultiplier = 1<<8;
+
     public NativeList()
     {
         ItemSize = Unsafe.SizeOf<T>();
-        arena = ArenaManager.Create((nuint)(ItemSize)*40);
+        arena = ArenaManager.Create((nuint)(ItemSize)*ArenaSizeMultiplier);
     }
 
     public void Add(T data)
@@ -27,26 +29,27 @@ ref struct NativeList<T> : IDisposable where T : unmanaged
 
     public unsafe void RemoveAt(Index index)
     {
-        ValidateIndex(index);
 
         int id = index.GetOffset(Count);
+        ValidateIndex(id);
+
 
         //shift all items in arena after index
-        for(int i = id; i <Count-1; i++)
+        for (int i = id; i <Count-1; i++)
         {
             var nextVal = this[i+1];
             Set(i, nextVal);
         }
 
-        var cur = ValidateIndex(Count);
+        var cur = ValidateIndex(Count-1);
 
-        cur.AsPointer()->Reduce((nuint)ItemSize);
+        cur->Reduce((nuint)ItemSize);
         Count--;
     }
 
-    public void InsertAt(Index index, T data)
+    public unsafe void InsertAt(Index index, T data)
     {
-        ValidateIndex(index);
+        ValidateIndex(index.GetOffset(index.GetOffset(Count)));
 
         //add some space in end for shifting values one place
         Add(data);
@@ -79,11 +82,11 @@ ref struct NativeList<T> : IDisposable where T : unmanaged
         set=> arena.SetItemInAll<T>(index.GetOffset(Count), value);
     }
 
-    ArenaSafeHandle ValidateIndex(Index index)
+    unsafe Arena* ValidateIndex(int index)
     {
-        var cur = arena.GetArenaByItemIndex(index.GetOffset(Count), ItemSize, out int indexInArena);
+        var cur = arena.GetArenaByItemIndex(index, ItemSize, out int indexInArena);
 
-        if (indexInArena == -1 || cur == ArenaSafeHandle.Zero)
+        if (indexInArena == -1 || cur == null)
             throw new IndexOutOfRangeException();
 
         return cur;

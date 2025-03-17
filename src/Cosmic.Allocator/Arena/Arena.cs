@@ -13,6 +13,11 @@ namespace Cosmic.Allocator
         public Arena* Next { get; internal set; }
 
         /// <summary>
+        /// Pointer to the 4 next arena in the chain.
+        /// </summary>
+        public Arena* Next4 { get; internal set; }
+
+        /// <summary>
         /// Pointer to the next arena in the chain.
         /// </summary>
         public Arena* Previous { get; internal set; }
@@ -64,6 +69,7 @@ namespace Cosmic.Allocator
             Data = null;
             Next = null;
             Previous = null;
+            Next4 = null;
         }
 
         /// <summary>
@@ -78,6 +84,7 @@ namespace Cosmic.Allocator
             Next = null;
             Previous = null;
             StartingOffset = 0;
+            Next4 = null;
         }
 
 

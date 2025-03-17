@@ -4,25 +4,45 @@ using BenchmarkDotNet.Running;
 
 var summary = BenchmarkRunner.Run<Benchmarks>();
 
+//using NativeList<Point> pointList = new NativeList<Point>();
+
+//for (int i = 0; i < 100000; i++)
+//{
+//    pointList.Add(new Point(i, i));
+//}
+
+//pointList.Set(4008, new Point(1, 1));
+
+//pointList.RemoveAt(0);
+//pointList.InsertAt(^1, new Point(-2, -2));
+////pointList.RemoveAt(^1);
+
+//for (int i = 0; i < pointList.Count; i++)
+//{
+//    Console.WriteLine(pointList[i]);
+//}
 
 public class Benchmarks
 {
+    const int Size = 100000;
 
     [Benchmark]
     public void NativeViaArena()
     {
-        using NativeList<Point> pointList = new NativeList<Point>();
+        NativeList<Point> pointList = new NativeList<Point>();
 
-        for (int i = 0; i < 4009; i++)
+        for (int i = 0; i < Size; i++)
         {
             pointList.Add(new Point(i, i));
         }
 
         pointList.Set(4008, new Point(1, 1));
 
-        pointList.RemoveAt(0);
-        pointList.InsertAt(^1, new Point(-2, -2));
+        //pointList.RemoveAt(0);
+        //pointList.InsertAt(^1, new Point(-2, -2));
         //pointList.RemoveAt(^1);
+
+       pointList.Dispose();
     }
 
     [Benchmark]
@@ -31,7 +51,7 @@ public class Benchmarks
         List<Point> pointList = new List<Point>();
 
         // Add points to the list
-        for (int i = 0; i < 4009; i++)
+        for (int i = 0; i < Size; i++)
         {
             pointList.Add(new Point(i, i));
         }
@@ -40,10 +60,10 @@ public class Benchmarks
         pointList[4008] = new Point(1, 1);
 
         // Remove the first element
-        pointList.RemoveAt(0);
+        //pointList.RemoveAt(0);
 
         // Insert a new element at the end
-        pointList.Insert(pointList.Count, new Point(-2, -2)); // Equivalent to InsertAt(^1)
+       // pointList.Insert(pointList.Count, new Point(-2, -2)); // Equivalent to InsertAt(^1)
 
     }
 }

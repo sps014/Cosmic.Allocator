@@ -108,16 +108,16 @@ public unsafe struct ArenaAllocator : IDisposable
     {
         var nestedArena =GetArenaByItemIndex(index, sizeof(T), out int byteOffset);
 
-        if (nestedArena == ArenaSafeHandle.Zero)
+        if (nestedArena == null)
             throw new Exception("Invalid Index");
 
-        return nestedArena.AsPointer()->DataRegion.GetItem<T>(byteOffset / sizeof(T));
+        return nestedArena->DataRegion.GetItem<T>(byteOffset / sizeof(T));
 
     }
 
-    public ArenaSafeHandle GetArenaByItemIndex(int index, int itemSize, out int byteOffset)
+    public Arena* GetArenaByItemIndex(int index, int itemSize, out int byteOffset)
     {
-        return ArenaManager.GetArenaByItemIndex(MainArena->CurrentHandle, index, itemSize, out byteOffset);
+        return GetArenaByItemIndex(MainArena, index, itemSize, out byteOffset);
     }
 
 
@@ -132,9 +132,37 @@ public unsafe struct ArenaAllocator : IDisposable
     {
         var nestedArena = GetArenaByItemIndex(index, sizeof(T), out int byteOffset);
 
-        if (nestedArena == ArenaSafeHandle.Zero)
+        if (nestedArena == null)
             throw new Exception("Invalid Index");
 
-        nestedArena.AsPointer()->DataRegion.SetItem(byteOffset / sizeof(T), item);
+        nestedArena->DataRegion.SetItem(byteOffset / sizeof(T), item);
+    }
+
+    public static unsafe Arena* GetArenaByItemIndex(Arena* arena, int index, int itemSize, out int byteOffset)
+    {
+        byteOffset = -1;
+
+        if (arena == null)
+            return null;
+
+        Arena* cur = arena;
+        int byteOffsetToIndex = index * itemSize;
+        do
+        {
+            int capacity = (int)cur->Capacity;
+
+            if (byteOffsetToIndex < capacity)
+            {
+                byteOffset = byteOffsetToIndex;
+                return cur;
+            }
+
+            cur = cur->Next;
+            byteOffsetToIndex -= capacity;
+
+        }
+        while (cur != null);
+
+        return null;
     }
 }
