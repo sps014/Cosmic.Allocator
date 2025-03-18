@@ -11,7 +11,7 @@ var summary = BenchmarkRunner.Run<Benchmarks>();
 //    pointList.Add(new Point(i, i));
 //}
 
-//pointList.Set(4008, new Point(1, 1));
+//pointList.Set(9, new Point(1, 1));
 
 //pointList.RemoveAt(0);
 //pointList.InsertAt(^1, new Point(-2, -2));

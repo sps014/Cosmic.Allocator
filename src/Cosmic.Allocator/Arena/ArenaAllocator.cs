@@ -2,34 +2,63 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
-using static System.Net.Mime.MediaTypeNames;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Cosmic.Allocator;
 
-public unsafe struct ArenaAllocator : IDisposable
+public unsafe ref struct ArenaAllocator : IDisposable
 {
-    public Arena* MainArena { get; private set; }
     internal Arena* LastArena { get; private set; }
+
     public nuint Capacity { get; private set; }
 
     public int Count { get; private set; }
 
+    public uint TotalArenaCount { get; private set; }
+
+    internal Arena* ArenaMap { get; private set; }
+
+    internal Span<IntPtr> ArenaPtrMapSpan { get; private set; }
+  
+    
     public ArenaAllocator()
     {
-        MainArena = null;
         LastArena = null;
         Capacity = 0;
         Count = 0;
+        TotalArenaCount = 0;
+        ArenaMap = null;
+        ArenaPtrMapSpan = Span<IntPtr>.Empty;
     }
-    public ArenaAllocator(nuint capacity)
+    public ArenaAllocator(nuint capacity,uint maxLinkedArenaCount)
     {
-        MainArena = ArenaManager.CreatePointer(capacity);
-        LastArena = MainArena;
+        var mainArena = ArenaManager.CreatePointer(capacity);
+        LastArena = mainArena;
+
         Capacity = capacity;
-        Count = 1;
+        Count = 0;
+        TotalArenaCount = Math.Max(maxLinkedArenaCount, 1);
+
+        //create arena ptr map so we dont need to build next and previous links 
+        uint arenaPtrMapSizeInByte = TotalArenaCount * (uint)Unsafe.SizeOf<IntPtr>();
+        ArenaMap = ArenaManager.CreatePointer(arenaPtrMapSizeInByte);
+        ArenaMap->Size = arenaPtrMapSizeInByte; 
+
+        ArenaPtrMapSpan = ArenaMap->AsSpan<IntPtr>();
+
+        StoreArenaAddressInMap(mainArena);
+    }
+
+    private void StoreArenaAddressInMap(Arena* arena)
+    {
+        if (Count >= TotalArenaCount)
+            throw new Exception("Total Number of linked arena capacity is reached.");
+
+        ArenaPtrMapSpan[Count] = (IntPtr)arena;
+        LastArena = arena;
+        Count++;
     }
 
     /// <summary>
@@ -46,7 +75,7 @@ public unsafe struct ArenaAllocator : IDisposable
 
         nuint size = (nuint)sizeof(T) * count;
         void* ptr = Alloc(size);
-        return new Span<T>(ptr, (int)size);
+        return new Span<T>(ptr, (int)count);
     }
 
     /// <summary>
@@ -57,7 +86,7 @@ public unsafe struct ArenaAllocator : IDisposable
     /// <exception cref="OutOfMemoryException">Thrown when the allocation size is greater than the capacity.</exception>
     public void* Alloc(nuint size)
     {
-        if (MainArena == null)
+        if (Count == 0)
             return null;
 
         return AllocImpl(size);
@@ -76,24 +105,29 @@ public unsafe struct ArenaAllocator : IDisposable
             LastArena->Size += size;
             return result;
         }
-
-        var lastArena = LastArena;
+        
         // If there is no next arena, create a new one and allocate from it
         var newArena = ArenaManager.CreatePointer(Capacity);
-        newArena->StartingOffset = lastArena->StartingOffset + Capacity;
+        newArena->StartingOffset = LastArena->StartingOffset + Capacity;
         
-        LastArena->Next = newArena;
-        newArena->Previous = lastArena;
-        LastArena = newArena;
-        Count++;
+        StoreArenaAddressInMap(newArena);
         
         return AllocImpl(size);
     }
 
     public void Dispose()
     {
-        if(MainArena != null)
-            MainArena->Free();
+        if (Count == 0)
+            return;
+
+        for (int i = 0; i < Count; i++)
+        {
+            var arena = (Arena*)ArenaPtrMapSpan[i].ToPointer();
+            arena->Free();
+        }
+
+        if(ArenaMap != null)
+            ArenaMap->Free();
     }
 
 
@@ -115,10 +149,6 @@ public unsafe struct ArenaAllocator : IDisposable
 
     }
 
-    public Arena* GetArenaByItemIndex(int index, int itemSize, out int byteOffset)
-    {
-        return GetArenaByItemIndex(MainArena, index, itemSize, out byteOffset);
-    }
 
 
     /// <summary>
@@ -138,31 +168,24 @@ public unsafe struct ArenaAllocator : IDisposable
         nestedArena->DataRegion.SetItem(byteOffset / sizeof(T), item);
     }
 
-    public static unsafe Arena* GetArenaByItemIndex(Arena* arena, int index, int itemSize, out int byteOffset)
+    public unsafe Arena* GetArenaByItemIndex(int index, int itemSize, out int byteOffset)
     {
         byteOffset = -1;
 
-        if (arena == null)
+        if (Count == 0)
             return null;
 
-        Arena* cur = arena;
-        int byteOffsetToIndex = index * itemSize;
-        do
-        {
-            int capacity = (int)cur->Capacity;
+        var countOfItemsPerArena = (int)Capacity / itemSize;
 
-            if (byteOffsetToIndex < capacity)
-            {
-                byteOffset = byteOffsetToIndex;
-                return cur;
-            }
+        int indexInArenaMap = index / countOfItemsPerArena;
 
-            cur = cur->Next;
-            byteOffsetToIndex -= capacity;
+        if (indexInArenaMap >= Count)
+            throw new Exception("index doesn't is not present in current allocated arenas.");
 
-        }
-        while (cur != null);
+        var arena = (Arena*)ArenaPtrMapSpan[indexInArenaMap].ToPointer();
 
-        return null;
+        byteOffset = (index % countOfItemsPerArena)*itemSize;
+
+        return arena;
     }
 }

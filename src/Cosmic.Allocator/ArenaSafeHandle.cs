@@ -8,7 +8,6 @@ public readonly struct ArenaSafeHandle
 {
     public static ArenaSafeHandle Zero = new ArenaSafeHandle();
     public readonly IntPtr Address { get; }
-    public unsafe ArenaSafeHandle NextHandle => AsPointer()->NextArenaHandle;
     public unsafe SafeRegionHandle DataRegion => AsPointer()->DataRegion;
 
     public ArenaSafeHandle()
